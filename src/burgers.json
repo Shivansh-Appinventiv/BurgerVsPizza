@@ -1,0 +1,71 @@
+{
+  "vegClassic": [
+    {
+      "name": "Classic Aloo Tikki Burger",
+      "photo": "https://cdn-a.william-reed.com/var/wrbm_gb_food_pharma/storage/images/7/6/8/5/2845867-1-eng-GB/McAloo-Tikki-enters-row-as-another-Indian-JV-starts-to-fall-down_wrbm_large.jpg",
+      "price": "49"
+    },
+    {
+      "name": "Classic Spicy Aloo Tikki Burger",
+      "photo": "https://5.imimg.com/data5/IF/DP/GLADMIN-22570984/aloo-tikki-burger-500x500.png",
+      "price": "59"
+    },
+    {
+      "name": "Classic Veggie Burger",
+      "photo": "https://image.shutterstock.com/image-photo/tasty-vegetarian-burger-carrot-cutlet-260nw-1311655739.jpg",
+      "price": "69"
+    },
+    {
+      "name": "Classic Paneer Burger",
+      "photo": "https://5.imimg.com/data5/RN/JS/MY-54431334/paneer-cheese-burst-burger-500x500.png",
+      "price": "79"
+    },
+    {
+      "name": "Claasic Spicy Paneer Burger",
+      "photo": "https://mcdonaldsblog.in/wp-content/uploads/2016/06/mcspicy-paneer-1.jpg",
+      "price": "89"
+    },
+    {
+      "name": "Classic Veg Kebab Burger",
+      "photo": "https://www.peta.org/wp-content/uploads/2016/11/Black-Bean-Veggie-Burger.jpg",
+      "price": "79"
+    }
+  ],
+  "nonVegClassic": [
+    {
+      "name": "Classic Chicken Burger",
+      "photo": "https://4.imimg.com/data4/EW/PO/MY-10347843/chicken-burger-patty-500x500.jpg",
+      "price": "69"
+    },
+    {
+      "name": "Classic Spicy Chicken Burger",
+      "photo": "https://imgstaticcontent.lbb.in/lbbnew/wp-content/uploads/sites/1/2016/02/Spicy-grilled-chicken-dunkin-donut-burger.jpg",
+      "price": "79"
+    },
+    {
+      "name": "Classic Fish Burger",
+      "photo": "https://www.thedinnerbite.com/wp-content/uploads/2021/04/fish-burger-filet-recipe-img-12.jpg",
+      "price": "59"
+    },
+    {
+      "name": "Classic Spicy Fish Burger",
+      "photo": "https://images.ctfassets.net/qu53tdnhexvd/62XN5msKZ22QAGm8AQUKyU/4e3def0b91438f7a29a584afd8e014eb/fish-burger-with-spicy-mayo.jpg?w=1440&h=1080",
+      "price": "69"
+    },
+    {
+      "name": "Classic Egg Burger",
+      "photo": "https://www.eggs.ca/assets/RecipePhotos/Egg-Burger.jpg",
+      "price": "49"
+    },
+    {
+      "name": "Classic Spicy Egg Burger",
+      "photo": "https://i.pinimg.com/originals/d4/74/cc/d474ccded5bc5098f66a75240d1845e1.jpg",
+      "price": "59"
+    },
+    {
+      "name": "Classic Chiken Kebab Burger",
+      "photo": "https://mcdonaldsblog.in/wp-content/uploads/2017/03/masala-dosa-1_McDonaldsIndia_140217.jpg",
+      "price": "99"
+    }
+  ]
+}
