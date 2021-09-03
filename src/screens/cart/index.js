@@ -4,7 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import RemoveIcon from "@material-ui/icons/Remove";
 import AddIcon from "@material-ui/icons/Add";
 import CButton from "../../components/Controls/Button/containedButton";
-import { addToOrders, addToCart, removeFromCart } from "../../redux/userSlice";
+import {
+  addToOrders,
+  addToCart,
+  removeFromCart,
+  addToAdminOrders,
+} from "../../redux/userSlice";
+import Loader from "../../components/Loader";
+import uuid from "uuid-random";
 
 const useStyles = makeStyles((theme) => ({
   screenContainer: {
@@ -107,7 +114,8 @@ export default function Cart() {
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.loginSignUp);
-  const { cartItems, orders } = useSelector((state) => state.user);
+  const { cartItems, orders, getUserDataStatus, userInfo, adminOrders } =
+    useSelector((state) => state.user);
 
   const handleIncrement = ({ name, photo, price }) => {
     dispatch(
@@ -157,163 +165,193 @@ export default function Cart() {
   let deliveryCharge = 20;
   let grandTotal = 0;
 
+  const today = new Date();
+  const docId = `${today.getDate()}_${
+    today.getMonth() + 1
+  }_${today.getFullYear()}`;
+
   const handleCheckout = () => {
+    const orderId = uuid();
     dispatch(
       addToOrders({
+        orderId,
         user,
         newOrder: cartItems,
         orders: orders,
         orderPrice: grandTotal,
+        adminOrders,
+      })
+    );
+    dispatch(
+      addToAdminOrders({
+        docId: docId,
+        adminOrders,
+        adminItem: {
+          userId: user,
+          orderId: orderId,
+          items: { ...cartItems },
+          orderDate: new Date().toLocaleDateString(),
+          trackStatus: null,
+          orderPrice: grandTotal,
+          address: userInfo.address,
+          name: `${userInfo.firstName} ${userInfo.lastName}`,
+        },
       })
     );
   };
 
   return (
     <div className={classes.screenContainer}>
-      <Container maxWidth={"lg"}>
-        {Object.keys(cartItems).length !== 0 ? (
-          <>
-            {Object.values(cartItems)?.map((item, index) => {
-              if (item.quantity === 0) {
-                let obj = { ...cartItems };
-                delete obj[item.name];
-                dispatch(
-                  removeFromCart({ obj: { ...obj }, user: user, orders })
-                );
-                return null;
-              }
-              totalPrice += Number(item.price) * Number(item.quantity);
-              return (
-                <div className={classes.orderItem} key={item.name}>
-                  <div className={classes.orderLeft}>
-                    <img
-                      src={item.photo}
-                      alt={item.name}
-                      height={"auto"}
-                      width={"auto"}
-                      className={classes.orderImage}
-                    />
-                    <span className={classes.orderText}>{item.name}</span>
-                  </div>
-                  <div className={classes.orderQuantity}>
-                    <div className={classes.quantityBtn}>
-                      <button
-                        className={classes.operator}
-                        onClick={() =>
-                          handleDecrement({
-                            name: item.name,
-                            photo: item.photo,
-                            price: item.price,
-                          })
-                        }
-                      >
-                        <RemoveIcon />
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        className={classes.operator}
-                        onClick={() =>
-                          handleIncrement({
-                            name: item.name,
-                            photo: item.photo,
-                            price: item.price,
-                          })
-                        }
-                      >
-                        <AddIcon />
-                      </button>
-                    </div>
-                    <div className={classes.priceTag}>
+      {getUserDataStatus === "success" ? (
+        <Container maxWidth={"lg"}>
+          {Object.keys(cartItems).length !== 0 ? (
+            <>
+              {Object.values(cartItems)?.map((item, index) => {
+                if (item.quantity === 0) {
+                  let obj = { ...cartItems };
+                  delete obj[item.name];
+                  dispatch(
+                    removeFromCart({ obj: { ...obj }, user: user, orders })
+                  );
+                  return null;
+                }
+                totalPrice += Number(item.price) * Number(item.quantity);
+                return (
+                  <div className={classes.orderItem} key={item.name}>
+                    <div className={classes.orderLeft}>
                       <img
-                        src={
-                          "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
-                        }
-                        alt={"rupee_symbol"}
-                        height={"10px"}
-                        width={"10px"}
+                        src={item.photo}
+                        alt={item.name}
+                        height={"auto"}
+                        width={"auto"}
+                        className={classes.orderImage}
                       />
-                      {item.price}
+                      <span className={classes.orderText}>{item.name}</span>
+                    </div>
+                    <div className={classes.orderQuantity}>
+                      <div className={classes.quantityBtn}>
+                        <button
+                          className={classes.operator}
+                          onClick={() =>
+                            handleDecrement({
+                              name: item.name,
+                              photo: item.photo,
+                              price: item.price,
+                            })
+                          }
+                        >
+                          <RemoveIcon />
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          className={classes.operator}
+                          onClick={() =>
+                            handleIncrement({
+                              name: item.name,
+                              photo: item.photo,
+                              price: item.price,
+                            })
+                          }
+                        >
+                          <AddIcon />
+                        </button>
+                      </div>
+                      <div className={classes.priceTag}>
+                        <img
+                          src={
+                            "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                          }
+                          alt={"rupee_symbol"}
+                          height={"10px"}
+                          width={"10px"}
+                        />
+                        {item.price}
+                      </div>
                     </div>
                   </div>
+                );
+              })}
+              <Divider />
+              <div className={classes.grandTotal}>
+                <div className={classes.totalContainer}>
+                  <div>{"Item Total"}</div>
+                  <div>
+                    <img
+                      src={
+                        "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                      }
+                      alt={"rupee_symbol"}
+                      height={"10px"}
+                      width={"10px"}
+                    />
+                    {totalPrice}
+                  </div>
                 </div>
-              );
-            })}
-            <Divider />
-            <div className={classes.grandTotal}>
-              <div className={classes.totalContainer}>
-                <div>{"Item Total"}</div>
-                <div>
-                  <img
-                    src={
-                      "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                <div className={classes.totalContainer}>
+                  <div>{"Delivery Charge"}</div>
+                  <div>
+                    <img
+                      src={
+                        "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                      }
+                      alt={"rupee_symbol"}
+                      height={"10px"}
+                      width={"10px"}
+                    />
+                    {deliveryCharge}
+                  </div>
+                </div>
+                <div className={classes.totalContainer}>
+                  <div style={{ borderBottom: "1px dashed grey" }}>
+                    {"Taxes & charges"}
+                  </div>
+                  <div>
+                    <img
+                      src={
+                        "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                      }
+                      alt={"rupee_symbol"}
+                      height={"10px"}
+                      width={"10px"}
+                    />
+                    {(gst = (totalPrice * 0.18).toFixed(2))}
+                  </div>
+                </div>
+                <div className={classes.totalContainer}>
+                  <div>{"Grand Total"}</div>
+                  <div>
+                    <img
+                      src={
+                        "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
+                      }
+                      alt={"rupee_symbol"}
+                      height={"10px"}
+                      width={"10px"}
+                    />
+                    {
+                      (grandTotal =
+                        Number(totalPrice) +
+                        Number(gst) +
+                        Number(deliveryCharge))
                     }
-                    alt={"rupee_symbol"}
-                    height={"10px"}
-                    width={"10px"}
-                  />
-                  {totalPrice}
+                  </div>
                 </div>
               </div>
-              <div className={classes.totalContainer}>
-                <div>{"Delivery Charge"}</div>
-                <div>
-                  <img
-                    src={
-                      "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
-                    }
-                    alt={"rupee_symbol"}
-                    height={"10px"}
-                    width={"10px"}
-                  />
-                  {deliveryCharge}
-                </div>
-              </div>
-              <div className={classes.totalContainer}>
-                <div style={{ borderBottom: "1px dashed grey" }}>
-                  {"Taxes & charges"}
-                </div>
-                <div>
-                  <img
-                    src={
-                      "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
-                    }
-                    alt={"rupee_symbol"}
-                    height={"10px"}
-                    width={"10px"}
-                  />
-                  {(gst = (totalPrice * 0.18).toFixed(2))}
-                </div>
-              </div>
-              <div className={classes.totalContainer}>
-                <div>{"Grand Total"}</div>
-                <div>
-                  <img
-                    src={
-                      "https://iconvulture.com/wp-content/uploads/2017/12/rupee-indian.svg"
-                    }
-                    alt={"rupee_symbol"}
-                    height={"10px"}
-                    width={"10px"}
-                  />
-                  {
-                    (grandTotal =
-                      Number(totalPrice) + Number(gst) + Number(deliveryCharge))
-                  }
-                </div>
-              </div>
+              <Divider />
+              <CButton
+                fullWidth
+                onClick={handleCheckout}
+              >{`CheckOut (${grandTotal})`}</CButton>
+            </>
+          ) : (
+            <div className={classes.emptyCartContainer}>
+              <div className={classes.emptyCartText}>{"Cart is Empty"}</div>
             </div>
-            <Divider />
-            <CButton
-              fullWidth
-              onClick={handleCheckout}
-            >{`CheckOut (${grandTotal})`}</CButton>
-          </>
-        ) : (
-          <div className={classes.emptyCartContainer}>
-            <div className={classes.emptyCartText}>{"Cart is Empty"}</div>
-          </div>
-        )}
-      </Container>
+          )}
+        </Container>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 }

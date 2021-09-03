@@ -1,5 +1,7 @@
 import React from "react";
 import "./App.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 //component imports
 
@@ -23,17 +25,17 @@ import {
 
 //redux imports
 
-import { auth } from "./authentication/firebase";
+import { auth, db } from "./authentication/firebase";
 import { useSelector, useDispatch } from "react-redux";
 import { getProducts } from "./redux/productSlice";
 import { userSession } from "./redux/loginSignUpSlice";
-import { getUserData } from "./redux/userSlice";
+import { setUserData, setErrorData, setAdminOrders } from "./redux/userSlice";
 
 function PrivateRoute(props) {
   const { component: Component, currentLink, ...rest } = props;
 
-  const dispatch = useDispatch();
-  const { loginStatus, registerStatus } = useSelector(
+  //const dispatch = useDispatch();
+  const { loginStatus, registerStatus, error } = useSelector(
     (state) => state.loginSignUp
   );
 
@@ -44,19 +46,32 @@ function PrivateRoute(props) {
   }, [props.path, history]);
 
   React.useEffect(() => {
-    auth.onAuthStateChanged((isUser) => {
-      if (isUser) {
-        dispatch(
-          userSession({
-            user: isUser.uid,
-            status: "loggedIn",
-          })
-        );
-      } else {
-        //dispatch(userLogout());
-      }
-    });
-  }, [dispatch]);
+    if (loginStatus === "success" || registerStatus === "success") {
+      toast.success(loginStatus, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [loginStatus, registerStatus]);
+
+  React.useEffect(() => {
+    if (error) {
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [error]);
 
   //console.log(loginStatus,registerStatus);
 
@@ -71,6 +86,17 @@ function PrivateRoute(props) {
             <>
               <Header currentLink={currentLink} />
               <Component />
+              <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
             </>
           ) : (
             <Redirect to={"/"} />
@@ -93,10 +119,11 @@ function LoginRoute(props) {
         render={() =>
           loginStatus !== "loggedIn" && !user ? (
             <>
+              {console.log(loginStatus, user)}
               <Component />
             </>
           ) : (
-            <Redirect to={"/home"} />
+            <Redirect to={"/menu"} />
           )
         }
       />
@@ -109,10 +136,50 @@ function App() {
   const { user } = useSelector((state) => state.loginSignUp);
 
   React.useEffect(() => {
+    auth.onAuthStateChanged((isUser) => {
+      if (isUser) {
+        dispatch(
+          userSession({
+            user: isUser.uid,
+            status: "loggedIn",
+          })
+        );
+      } else {
+        //dispatch(userLogout());
+      }
+    });
+  }, [dispatch]);
+
+  React.useEffect(() => {
     if (user) {
       //console.log("App.js");
       dispatch(getProducts());
-      dispatch(getUserData({ user }));
+
+      //userData
+
+      db.collection("users")
+        .doc(user)
+        .onSnapshot((doc) => {
+          if (!doc.exists) {
+            dispatch(setErrorData());
+          } else {
+            dispatch(setUserData({ ...doc.data() }));
+          }
+        });
+
+      //adminOrders
+
+      const today = new Date();
+      const docId = `${today.getDate()}_${
+        today.getMonth() + 1
+      }_${today.getFullYear()}`;
+
+      db.collection("orders")
+        .doc(docId)
+        .onSnapshot((doc) => {
+          console.log(doc.data());
+          dispatch(setAdminOrders({ ...doc.data() }));
+        });
     }
   }, [user, dispatch]);
 

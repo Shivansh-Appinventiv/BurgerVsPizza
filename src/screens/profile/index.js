@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { userLogout } from "../../redux/loginSignUpSlice";
 import { auth } from "../../authentication/firebase";
 import { addUserInfo } from "../../redux/userSlice";
+import Loader from "../../components/Loader";
 
 const useStyles = makeStyles((theme) => ({
   screenContainer: {
@@ -33,19 +34,13 @@ export default function Profile() {
 
   const [disabled, setDisabled] = React.useState(true);
 
-  const { userInfo } = useSelector((state) => state.user);
+  const { userInfo, getUserDataStatus } = useSelector((state) => state.user);
 
   const onSubmit = (values) => {
     console.log(values);
     dispatch(addUserInfo({ values, user }));
     setDisabled(true);
   };
-
-  // React.useEffect(() => {
-  //   if (JSON.stringify(userInfo) === "{}") {
-  //     setDisabled(false);
-  //   }
-  // }, [userInfo]);
 
   const initialValues = {
     firstName: "",
@@ -73,129 +68,133 @@ export default function Profile() {
 
   return (
     <div className={classes.screenContainer}>
-      <Container maxWidth={"lg"}>
-        <div>
+      {getUserDataStatus === "success" ? (
+        <Container maxWidth={"lg"}>
           <div>
-            {savedValues && (
-              <Formik
-                initialValues={savedValues || initialValues}
-                validationSchema={Schema.ProfileSchema}
-                onSubmit={onSubmit}
-                enableReinitialize
-              >
-                <Form autoComplete={"off"}>
-                  <Grid container>
-                    <Grid container item xs={12} spacing={1}>
-                      <Grid item xs={6} className={classes.profileTitle}>
-                        {"User Information"}
+            <div>
+              {savedValues && (
+                <Formik
+                  initialValues={savedValues || initialValues}
+                  validationSchema={Schema.ProfileSchema}
+                  onSubmit={onSubmit}
+                  enableReinitialize
+                >
+                  <Form autoComplete={"off"}>
+                    <Grid container>
+                      <Grid container item xs={12} spacing={1}>
+                        <Grid item xs={6} className={classes.profileTitle}>
+                          {"User Information"}
+                        </Grid>
+                        <Grid
+                          item
+                          xs={6}
+                          className={classes.profileTitle}
+                          style={{ textAlign: "right" }}
+                        >
+                          <EditIcon
+                            style={{ cursor: "pointer" }}
+                            onClick={handleEdit}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Input
+                            disabled={disabled}
+                            name={"firstName"}
+                            label={"FirstName"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Input
+                            disabled={disabled}
+                            name={"lastName"}
+                            label={"LastName"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Input
+                            disabled={disabled}
+                            name={"email"}
+                            label={"Email"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Input
+                            disabled={disabled}
+                            name={"phoneNo"}
+                            label={"Phone Number"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid
-                        item
-                        xs={6}
-                        className={classes.profileTitle}
-                        style={{ textAlign: "right" }}
-                      >
-                        <EditIcon
-                          style={{ cursor: "pointer" }}
-                          onClick={handleEdit}
-                        />
+                      <Grid container item xs={12} spacing={1}>
+                        <Grid item xs={12} className={classes.profileTitle}>
+                          {"Address Information"}
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Input
+                            disabled={disabled}
+                            name={"address"}
+                            label={"Address"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Input
+                            disabled={disabled}
+                            name={"city"}
+                            label={"City"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Input
+                            disabled={disabled}
+                            name={"state"}
+                            label={"State"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                          <Input
+                            disabled={disabled}
+                            name={"zip"}
+                            label={"ZipCode"}
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Input
-                          disabled={disabled}
-                          name={"firstName"}
-                          label={"FirstName"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Input
-                          disabled={disabled}
-                          name={"lastName"}
-                          label={"LastName"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Input
-                          disabled={disabled}
-                          name={"email"}
-                          label={"Email"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
-                        <Input
-                          disabled={disabled}
-                          name={"phoneNo"}
-                          label={"Phone Number"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                    </Grid>
-                    <Grid container item xs={12} spacing={1}>
-                      <Grid item xs={12} className={classes.profileTitle}>
-                        {"Address Information"}
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Input
-                          disabled={disabled}
-                          name={"address"}
-                          label={"Address"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Input
-                          disabled={disabled}
-                          name={"city"}
-                          label={"City"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Input
-                          disabled={disabled}
-                          name={"state"}
-                          label={"State"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                      <Grid item xs={12} md={4}>
-                        <Input
-                          disabled={disabled}
-                          name={"zip"}
-                          label={"ZipCode"}
-                          InputLabelProps={{ shrink: true }}
-                        />
-                      </Grid>
-                    </Grid>
-                    {!disabled && (
+                      {!disabled && (
+                        <Grid container item xs={12} spacing={1}>
+                          <Grid item xs={12}>
+                            <OButton type={"submit"} fullWidth>
+                              {"Save"}
+                            </OButton>
+                          </Grid>
+                        </Grid>
+                      )}
                       <Grid container item xs={12} spacing={1}>
                         <Grid item xs={12}>
-                          <OButton type={"submit"} fullWidth>
-                            {"Save"}
+                          <OButton
+                            endIcon={<PowerSettingsNewIcon />}
+                            onClick={handleLogout}
+                          >
+                            {"Logout"}
                           </OButton>
                         </Grid>
                       </Grid>
-                    )}
-                    <Grid container item xs={12} spacing={1}>
-                      <Grid item xs={12}>
-                        <OButton
-                          endIcon={<PowerSettingsNewIcon />}
-                          onClick={handleLogout}
-                        >
-                          {"Logout"}
-                        </OButton>
-                      </Grid>
                     </Grid>
-                  </Grid>
-                </Form>
-              </Formik>
-            )}
+                  </Form>
+                </Formik>
+              )}
+            </div>
           </div>
-        </div>
-      </Container>
+        </Container>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 }

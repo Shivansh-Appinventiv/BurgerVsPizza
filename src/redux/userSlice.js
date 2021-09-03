@@ -1,23 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { db } from "../authentication/firebase";
-import uuid from "uuid-random";
-
-export const getUserData = createAsyncThunk(
-  "user/getUserData",
-  async ({ user }, { dispatch }) => {
-    await db
-      .collection("users")
-      .doc(user)
-      .onSnapshot((doc) => {
-        if (doc.data()) {
-          console.log("Hello GetUserDta");
-          dispatch(setUserData({ data: doc.data() }));
-        } else {
-          dispatch(setErrorData());
-        }
-      });
-  }
-);
 
 export const addToCart = createAsyncThunk(
   "user/addToCart",
@@ -49,8 +31,8 @@ export const removeFromCart = createAsyncThunk(
 
 export const addToOrders = createAsyncThunk(
   "user/addToOrders",
-  async ({ user, newOrder, orders, orderPrice }) => {
-    console.log(newOrder, orders, user);
+  async ({ user, newOrder, orders, orderPrice, orderId }) => {
+    //console.log(newOrder, orders, user);
     await db
       .collection("users")
       .doc(user)
@@ -58,7 +40,7 @@ export const addToOrders = createAsyncThunk(
         orders: [
           ...orders,
           {
-            orderId: uuid(),
+            orderId,
             items: { ...newOrder },
             orderDate: new Date().toLocaleDateString(),
             trackStatus: null,
@@ -70,11 +52,22 @@ export const addToOrders = createAsyncThunk(
   }
 );
 
+export const addToAdminOrders = createAsyncThunk(
+  "user/addToAdminOrders",
+  async ({ adminOrders, adminItem, docId }) => {
+    //console.log(adminOrders, adminItem);
+    await db
+      .collection("orders")
+      .doc(docId)
+      .update({
+        orders: [...adminOrders, { ...adminItem }],
+      });
+  }
+);
+
 export const addUserInfo = createAsyncThunk(
   "user/addUserInfo",
   async ({ values, user }) => {
-    // const { firstName, lastName, phoneNo, email, address, city, state, zip } =
-    //   values;
     await db
       .collection("users")
       .doc(user)
@@ -88,6 +81,7 @@ const userSlice = createSlice({
     cartItems: {},
     orders: [],
     userInfo: {},
+    adminOrders: [],
     getUserDataStatus: null,
     addToCartStatus: null,
     removeFromCartStatus: null,
@@ -137,16 +131,20 @@ const userSlice = createSlice({
   reducers: {
     setUserData: (state, action) => {
       state.getUserDataStatus = "success";
-      state.cartItems = { ...action.payload?.data?.cart };
-      state.orders = [...action.payload?.data.orders];
-      state.userInfo = { ...action.payload?.data?.userInfo };
+      state.cartItems = { ...action.payload?.cart };
+      state.orders = [...action.payload?.orders];
+      state.userInfo = { ...action.payload?.userInfo };
     },
     setErrorData: (state, action) => {
       state.error = "something went wrong....";
     },
+    setAdminOrders: (state, action) => {
+      console.log(action.payload);
+      state.adminOrders = [...action.payload?.orders];
+    },
   },
 });
 
-export const { setUserData, setErrorData } = userSlice.actions;
+export const { setUserData, setErrorData, setAdminOrders } = userSlice.actions;
 
 export default userSlice.reducer;

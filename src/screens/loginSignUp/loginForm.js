@@ -86,7 +86,7 @@ export default function LoginForm(props) {
 
   React.useEffect(() => {
     if (loginStatus === "success") {
-      history.push("/home");
+      history.push("/menu");
     }
   }, [loginStatus, history]);
 

@@ -3,6 +3,7 @@ import { Container, Grid, makeStyles } from "@material-ui/core";
 import Navigator from "../../components/BreadCrumb";
 import { useSelector } from "react-redux";
 import Card from "../../components/Card";
+import Loader from "../../components/Loader";
 
 const useStyles = makeStyles((theme) => ({
   screenContainer: {
@@ -63,7 +64,7 @@ export default function Menu() {
   const classes = useStyles();
 
   //const dispatch = useDispatch();
-  const { products } = useSelector((state) => state.products);
+  const { products, getProductStatus } = useSelector((state) => state.products);
 
   const [selectedCategory, setSelectedCategory] = React.useState(null);
   const [showCategory, setShowCategory] = React.useState(null);
@@ -80,107 +81,113 @@ export default function Menu() {
 
   return (
     <div className={classes.screenContainer}>
-      <Container maxWidth={"lg"}>
-        <Navigator currentLink={"Menu"} />
-        <Grid container>
-          <Grid item container xs={12}>
-            {products?.map((product, index) => {
-              //console.log(selectedCategory);
-              return (
-                <Grid
-                  item
-                  xs={3}
-                  md={2}
-                  key={product.data.category}
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <MenuItem
-                    category={product.data.category}
-                    categoryImage={product.data.categoryImage}
-                    handleClick={handleClick}
-                    index={index}
-                    currentElement={selectedCategory}
-                  />
-                </Grid>
-              );
-            })}
-          </Grid>
-        </Grid>
-        <Grid container>
-          <Grid item container xs={12}>
-            {selectedCategory !== "Burgers" && selectedCategory !== "Pizza" ? (
-              showCategory?.data?.products?.map((product, index) => {
+      {getProductStatus === "success" ? (
+        <Container maxWidth={"lg"}>
+          <Navigator currentLink={"Menu"} />
+          <Grid container>
+            <Grid item container xs={12}>
+              {products?.map((product, index) => {
                 return (
                   <Grid
                     item
-                    xs={12}
-                    md={6}
-                    lg={3}
-                    key={product?.itemName}
-                    className={classes.cardContainer}
+                    xs={3}
+                    md={2}
+                    key={product.data.category}
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                    }}
                   >
-                    <Card
-                      name={product?.itemName}
-                      photo={product?.itemPhoto}
-                      price={product?.itemPrice}
+                    <MenuItem
+                      category={product.data.category}
+                      categoryImage={product.data.categoryImage}
+                      handleClick={handleClick}
+                      index={index}
+                      currentElement={selectedCategory}
                     />
                   </Grid>
                 );
-              })
-            ) : (
-              <>
-                {showCategory?.data?.products?.veg?.map((product, index) => {
-                  return (
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                      lg={3}
-                      key={product?.itemName}
-                      className={classes.cardContainer}
-                    >
-                      <Card
-                        name={product?.itemName}
-                        photo={product?.itemPhoto}
-                        price={product?.itemPrice}
-                        type={{
-                          name: "Veg",
-                          url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Veg_symbol.svg/120px-Veg_symbol.svg.png",
-                        }}
-                      />
-                    </Grid>
-                  );
-                })}
-                {showCategory?.data?.products?.nonVeg?.map((product, index) => {
-                  return (
-                    <Grid
-                      item
-                      xs={12}
-                      md={6}
-                      lg={3}
-                      key={product?.itemName}
-                      className={classes.cardContainer}
-                    >
-                      <Card
-                        name={product?.itemName}
-                        photo={product?.itemPhoto}
-                        price={product?.itemPrice}
-                        type={{
-                          name: "Non-Veg",
-                          url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Non_veg_symbol.svg/2048px-Non_veg_symbol.svg.png",
-                        }}
-                      />
-                    </Grid>
-                  );
-                })}
-              </>
-            )}
+              })}
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
+          <Grid container>
+            <Grid item container xs={12}>
+              {selectedCategory !== "Burgers" &&
+              selectedCategory !== "Pizzas" ? (
+                showCategory?.data?.products?.map((product, index) => {
+                  return (
+                    <Grid
+                      item
+                      xs={12}
+                      md={6}
+                      lg={3}
+                      key={product?.itemName}
+                      className={classes.cardContainer}
+                    >
+                      <Card
+                        name={product?.itemName}
+                        photo={product?.itemPhoto}
+                        price={product?.itemPrice}
+                      />
+                    </Grid>
+                  );
+                })
+              ) : (
+                <>
+                  {showCategory?.data?.products?.veg?.map((product, index) => {
+                    return (
+                      <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        lg={3}
+                        key={product?.itemName}
+                        className={classes.cardContainer}
+                      >
+                        <Card
+                          name={product?.itemName}
+                          photo={product?.itemPhoto}
+                          price={product?.itemPrice}
+                          type={{
+                            name: "Veg",
+                            url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Veg_symbol.svg/120px-Veg_symbol.svg.png",
+                          }}
+                        />
+                      </Grid>
+                    );
+                  })}
+                  {showCategory?.data?.products?.nonVeg?.map(
+                    (product, index) => {
+                      return (
+                        <Grid
+                          item
+                          xs={12}
+                          md={6}
+                          lg={3}
+                          key={product?.itemName}
+                          className={classes.cardContainer}
+                        >
+                          <Card
+                            name={product?.itemName}
+                            photo={product?.itemPhoto}
+                            price={product?.itemPrice}
+                            type={{
+                              name: "Non-Veg",
+                              url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Non_veg_symbol.svg/2048px-Non_veg_symbol.svg.png",
+                            }}
+                          />
+                        </Grid>
+                      );
+                    }
+                  )}
+                </>
+              )}
+            </Grid>
+          </Grid>
+        </Container>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 }

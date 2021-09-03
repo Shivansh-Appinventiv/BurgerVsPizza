@@ -135,14 +135,14 @@ export default function Header(props) {
       >
         <Grid container style={{ height: "100%" }}>
           <Grid item xs={12} sm={7} className={classes.gridDiv}>
-            <div className={classes.logoDiv} onClick={() => handleLink("home")}>
+            <div className={classes.logoDiv} onClick={() => handleLink("menu")}>
               <img
                 src={Images.HeaderImages.headerLogo}
                 alt={`header_logo`}
                 height={50}
                 width={120}
               />
-              <span style={{ marginLeft: "5px" }}>{`PizzaVsBurger`}</span>
+              <span style={{ marginLeft: "5px" }}>{`BurgerVsPizza`}</span>
             </div>
             <MenuIcon
               fontSize={"large"}

@@ -69,7 +69,7 @@ const loginSignUpSlice = createSlice({
     },
     [userLogin.fulfilled]: (state, action) => {
       state.loginStatus = "success";
-      state.user = action.payload.error.message;
+      //state.user = action.payload.error.message;
     },
     [userLogin.rejected]: (state, action) => {
       state.loginStatus = "failed";

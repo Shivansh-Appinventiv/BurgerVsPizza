@@ -7,6 +7,7 @@ import RegisterForm from "./registerForm";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
+import Loader from "../../components/Loader";
 
 const useStyle = makeStyles((theme) => ({
   screenContainer: {
@@ -67,7 +68,7 @@ const useStyle = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyle();
 
-  const { error } = useSelector((state) => state.loginSignUp);
+  const { error, loginStatus } = useSelector((state) => state.loginSignUp);
 
   const [flip, setFlip] = React.useState(false);
 
@@ -91,23 +92,27 @@ export default function Login() {
 
   return (
     <div className={classes.screenContainer}>
-      <div className={classes.outlineContainer}>
-        <div className={classes.leftWrapper}>
-          <img
-            src={Images.LoginImages.coverBurgerVsPizza}
-            alt={"coverBurgerVsPizza"}
-            width={"auto"}
-            height={"auto"}
-            className={classes.coverImg}
-          />
+      {loginStatus !== "loading" ? (
+        <div className={classes.outlineContainer}>
+          <div className={classes.leftWrapper}>
+            <img
+              src={Images.LoginImages.coverBurgerVsPizza}
+              alt={"coverBurgerVsPizza"}
+              width={"auto"}
+              height={"auto"}
+              className={classes.coverImg}
+            />
+          </div>
+          <div className={classes.rightWrapper}>
+            <ReactCardFlip isFlipped={flip} containerStyle={{ height: "100%" }}>
+              <LoginForm handleFlip={handleFlip} />
+              <RegisterForm handleFlip={handleFlip} />
+            </ReactCardFlip>
+          </div>
         </div>
-        <div className={classes.rightWrapper}>
-          <ReactCardFlip isFlipped={flip} containerStyle={{ height: "100%" }}>
-            <LoginForm handleFlip={handleFlip} />
-            <RegisterForm handleFlip={handleFlip} />
-          </ReactCardFlip>
-        </div>
-      </div>
+      ) : (
+        <Loader />
+      )}
       <ToastContainer
         position="top-right"
         autoClose={5000}
